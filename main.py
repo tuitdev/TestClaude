@@ -11,18 +11,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def download_youtube_video(update: Update, context: ContextTypes.DEFAULT_TYPE):
     url = update.message.text
     
-    # Check if the message is a YouTube link
     if "youtube.com" not in url and "youtu.be" not in url:
-        return  # Ignore normal chat messages that aren't links
+        return
 
     await update.message.reply_text("⏳ Downloading video from YouTube, please wait...")
 
-    # Configure yt-dlp to save as an mp4 file (capped under 50MB for Telegram bot limits)
     output_template = "downloaded_video.%(ext)s"
     ydl_opts = {
-        'format': 'mp4[height<=360]', # Keeps file size manageable for cloud hosting and Telegram
+        'format': 'mp4[height<=360]',
         'outtmpl': output_template,
-        'max_filesize': 50 * 1024 * 1024, # 50 MB limit
+        'max_filesize': 50 * 1024 * 1024,
+        # Spoof an Android client to bypass bot detection on cloud servers
+        'extractor_args': {'youtube': {'player_client': ['android']}},
     }
 
     try:
@@ -32,17 +32,14 @@ async def download_youtube_video(update: Update, context: ContextTypes.DEFAULT_T
 
         await update.message.reply_text("📤 Uploading video to Telegram...")
         
-        # Send video file back to the user
         with open(filename, "rb") as video_file:
             await update.message.reply_video(video=video_file, caption=info.get('title', 'YouTube Video'))
 
-        # Clean up the file from the server storage after sending
         if os.path.exists(filename):
             os.remove(filename)
 
     except Exception as e:
         await update.message.reply_text(f"❌ Failed to process video. Error: {str(e)}")
-        # Ensure cleanup on error
         if os.path.exists("downloaded_video.mp4"):
             os.remove("downloaded_video.mp4")
 
