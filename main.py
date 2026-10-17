@@ -21,8 +21,8 @@ async def download_youtube_video(update: Update, context: ContextTypes.DEFAULT_T
         'format': 'mp4[height<=360]',
         'outtmpl': output_template,
         'max_filesize': 50 * 1024 * 1024,
-        # Spoof an Android client to bypass bot detection on cloud servers
-        'extractor_args': {'youtube': {'player_client': ['android']}},
+        # Force iOS client instead of Android to bypass server-side blocks
+        'extractor_args': {'youtube': {'player_client': ['ios']}},
     }
 
     try:
