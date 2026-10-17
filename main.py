@@ -17,11 +17,11 @@ async def download_youtube_video(update: Update, context: ContextTypes.DEFAULT_T
     await update.message.reply_text("⏳ Downloading video from YouTube, please wait...")
 
     output_template = "downloaded_video.%(ext)s"
-    ydl_opts = {
+ydl_opts = {
         'format': 'mp4[height<=360]',
         'outtmpl': output_template,
         'max_filesize': 50 * 1024 * 1024,
-        # Force iOS client instead of Android to bypass server-side blocks
+        'cookies': 'cookies.txt',
         'extractor_args': {'youtube': {'player_client': ['ios']}},
     }
 
